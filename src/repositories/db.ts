@@ -14,7 +14,7 @@ export interface PostType {
     bloggerName: string
 }
 
-const uri = "mongodb+srv://mersus:genafe@bloggers.ypwqb.mongodb.net/bloggers?retryWrites=true&w=majority";
+const uri = "mongodb+srv://mersus:genafe@bloggers.ypwqb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 export const client = new MongoClient(uri);
 export const bloggersCollection = client.db().collection<BloggerType>('bloggers')
