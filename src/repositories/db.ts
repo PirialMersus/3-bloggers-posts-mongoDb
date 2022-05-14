@@ -23,7 +23,6 @@ export const postsCollection = client.db().collection<PostType>('posts')
 
 export async function runDb() {
     try {
-        // Connect the client to the server
         await client.connect();
         // Establish and verify connection
         await client.db("bloggers").command({ping: 1});
