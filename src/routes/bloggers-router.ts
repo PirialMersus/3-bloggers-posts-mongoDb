@@ -2,19 +2,19 @@ import {Request, Response, Router} from 'express'
 import {body, param} from "express-validator";
 import {bloggersService} from '../domain/bloggers-service';
 import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator-middleware";
-import {BloggerType} from "../repositories/db";
+import {IBlogger} from "../repositories/db";
 
 export const bloggersRouter = Router({})
 
 bloggersRouter.get('/', async (req: Request, res: Response) => {
-    const bloggers: BloggerType[] = await bloggersService.findBloggers(req.query.name?.toString())
+    const bloggers: IBlogger[] = await bloggersService.findBloggers(req.query.name?.toString())
     res.send(bloggers);
 })
     .get('/:bloggerId?',
         param('bloggerId').not().isEmpty().withMessage('enter bloggerId value in params'),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
-            let blogger: BloggerType | null = await bloggersService.findBloggerById(+req.params.bloggerId)
+            let blogger: IBlogger | null = await bloggersService.findBloggerById(+req.params.bloggerId)
 
             if (blogger) {
                 res.send(blogger)

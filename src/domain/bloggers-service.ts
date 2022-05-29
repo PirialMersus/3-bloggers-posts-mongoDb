@@ -1,14 +1,14 @@
 import {bloggersRepository} from "../repositories/bloggers-repository"
-import {BloggerType} from "../repositories/db"
+import {IBlogger} from "../repositories/db"
 
 export const bloggersService = {
-    async findBloggers(name: string | null | undefined): Promise<BloggerType[]> {
+    async findBloggers(name: string | null | undefined): Promise<IBlogger[]> {
         return bloggersRepository.findBloggers(name)
     },
-    async findBloggerById(id: number): Promise<BloggerType | null> {
+    async findBloggerById(id: number): Promise<IBlogger | null> {
         return bloggersRepository.findBloggerById(id)
     },
-    async createBlogger(name: string, youtubeUrl: string): Promise<BloggerType> {
+    async createBlogger(name: string, youtubeUrl: string): Promise<IBlogger> {
         const newBlogger = {
             name,
             youtubeUrl,

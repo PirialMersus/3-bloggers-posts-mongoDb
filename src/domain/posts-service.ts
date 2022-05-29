@@ -1,17 +1,17 @@
 import {bloggersRepository} from "../repositories/bloggers-repository"
-import {bloggersCollection, BloggerType, PostType} from "../repositories/db"
+import {bloggersCollection, IBlogger, IPost} from "../repositories/db"
 import { postsRepository } from "../repositories/posts-repository"
 
 export const postsService = {
-    async findPosts(name: string | null | undefined): Promise<PostType[]> {
+    async findPosts(name: string | null | undefined): Promise<IPost[]> {
         return postsRepository.findPosts(name)
     },
-    async findPostById(id: number): Promise<PostType | null> {
+    async findPostById(id: number): Promise<IPost | null> {
         return postsRepository.findPostById(id)
     },
-    async createPost(title: string, shortDescription: string, content: string, bloggerId: number): Promise<PostType> {
+    async createPost(title: string, shortDescription: string, content: string, bloggerId: number): Promise<IPost> {
         const blogger = await bloggersRepository.findBloggerById(bloggerId)
-        const newPost: PostType = {
+        const newPost: IPost = {
             title,
             shortDescription,
             content,

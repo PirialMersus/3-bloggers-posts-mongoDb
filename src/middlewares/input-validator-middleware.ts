@@ -2,11 +2,6 @@ import {NextFunction, Request, Response} from "express";
 import {validationResult} from "express-validator";
 
 interface IErrorMessage {
-    data: {
-        additionalProp1: string,
-        additionalProp2: string,
-        additionalProp3: string
-    },
     errorsMessages: [
         {
             message: string,
@@ -17,11 +12,6 @@ interface IErrorMessage {
 }
 
 export const errorObj: IErrorMessage = {
-    data: {
-        additionalProp1: '',
-        additionalProp2: '',
-        additionalProp3: '',
-    },
     errorsMessages: [{
         message: '',
         field: ''
@@ -36,7 +26,6 @@ export const inputValidatorMiddleware = (req: Request, res: Response, next: Next
         next()
     } else {
         res.status(400).json({
-            // data: {},
             resultCode: 0,
             errorsMessages: errors.array().map(e => {
                 return {

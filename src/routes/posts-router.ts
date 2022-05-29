@@ -1,21 +1,21 @@
 import {Request, Response, Router} from 'express'
 import {body, param} from "express-validator";
 import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator-middleware";
-import {PostType} from "../repositories/db";
+import {IPost} from "../repositories/db";
 import {postsService} from "../domain/posts-service";
 import {bloggersRepository} from "../repositories/bloggers-repository";
 
 export const postsRouter = Router({})
 
 postsRouter.get('/', async (req: Request, res: Response) => {
-    const post: PostType[] = await postsService.findPosts(req.query.name?.toString())
+    const post: IPost[] = await postsService.findPosts(req.query.name?.toString())
     res.send(post);
 })
     .get('/:postId?',
         param('postId').not().isEmpty().withMessage('enter postId value in params'),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
-            let post: PostType | null = await postsService.findPostById(+req.params.postId)
+            let post: IPost | null = await postsService.findPostById(+req.params.postId)
 
             if (post) {
                 res.send(post)

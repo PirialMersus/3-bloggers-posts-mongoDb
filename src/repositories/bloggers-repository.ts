@@ -1,14 +1,14 @@
-import {bloggersCollection, BloggerType} from "./db";
+import {bloggersCollection, IBlogger} from "./db";
 
 export const bloggersRepository = {
-    async findBloggers(name: string | null | undefined): Promise<BloggerType[]> {
+    async findBloggers(name: string | null | undefined): Promise<IBlogger[]> {
         const findObject: any = {}
 
         if (name) findObject.name = {$regex: name}
 
         return bloggersCollection.find(findObject).toArray()
     },
-    async findBloggerById(id: number): Promise<BloggerType | null> {
+    async findBloggerById(id: number): Promise<IBlogger | null> {
         const blogger = bloggersCollection.findOne({id})
         if (blogger) {
             return blogger
@@ -17,7 +17,7 @@ export const bloggersRepository = {
         }
     },
     // have to have return value type
-    async createBlogger(newBlogger: BloggerType): Promise<BloggerType> {
+    async createBlogger(newBlogger: IBlogger): Promise<IBlogger> {
 
         await bloggersCollection.insertOne(newBlogger)
         return newBlogger
