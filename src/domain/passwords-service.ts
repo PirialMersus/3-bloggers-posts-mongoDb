@@ -57,7 +57,7 @@ export const passwordsService = {
         })
         const newPasswordObject: IPasswordObjectType = {userId: userId, passwords: passwords}
         const isPasswordUpdated: Promise<boolean> = passwordsRepository.updatePasswords(passwords, userId)
-        return isPasswordUpdated ? newPasswordObject : null
+        return await isPasswordUpdated ? newPasswordObject : null
     },
 
     async deletePasswordObject(id: number, userId: number): Promise<boolean | null> {
