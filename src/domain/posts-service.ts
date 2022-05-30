@@ -1,6 +1,6 @@
 import {bloggersRepository} from "../repositories/bloggers-repository"
-import {bloggersCollection, IBlogger, IPost} from "../repositories/db"
-import { postsRepository } from "../repositories/posts-repository"
+import {IPost} from "../repositories/db"
+import {postsRepository} from "../repositories/posts-repository"
 
 export const postsService = {
     async findPosts(name: string | null | undefined): Promise<IPost[]> {

@@ -33,7 +33,6 @@ bloggersRouter.get('/', async (req: Request, res: Response) => {
                 throw new Error('enter correct value');
             }
 
-            // Indicates the success of this synchronous custom validator
             return true;
         }),
         inputValidatorMiddleware,
@@ -55,16 +54,12 @@ bloggersRouter.get('/', async (req: Request, res: Response) => {
             if (!regExp.test(req.body.youtubeUrl)) {
                 throw new Error('enter correct value');
             }
-
-            // Indicates the success of this synchronous custom validator
             return true;
         }),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
             const name = req.body.name;
             const youtubeUrl = req.body.youtubeUrl;
-
-            const id = +req.params.id;
 
             const isUpdated: boolean = await bloggersService.updateBlogger(+req.params.id, name, youtubeUrl)
             if (isUpdated) {
@@ -83,9 +78,7 @@ bloggersRouter.get('/', async (req: Request, res: Response) => {
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
             const id = +req.params.id;
-
             const isDeleted = await bloggersService.deleteBlogger(id)
-
 
             if (!isDeleted) {
                 errorObj.errorsMessages = [{

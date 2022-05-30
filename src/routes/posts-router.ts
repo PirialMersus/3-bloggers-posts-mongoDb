@@ -3,7 +3,6 @@ import {body, param} from "express-validator";
 import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator-middleware";
 import {IPost} from "../repositories/db";
 import {postsService} from "../domain/posts-service";
-import {bloggersRepository} from "../repositories/bloggers-repository";
 
 export const postsRouter = Router({})
 
@@ -41,7 +40,6 @@ postsRouter.get('/', async (req: Request, res: Response) => {
             res.status(201).send(newPost)
 
         })
-    //TODO ask for await for bloggersRepository.findBloggerById(+value)
     .put('/:id?',
         body('bloggerId').not().isEmpty().withMessage('enter input value in bloggerId field'),
         body('title').not().isEmpty().withMessage('enter input value in title field'),

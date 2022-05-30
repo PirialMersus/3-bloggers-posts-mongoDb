@@ -1,9 +1,7 @@
 import {Request, Response, Router} from 'express'
 import {body, param} from "express-validator";
 import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator-middleware";
-import {IPassword, IPasswordObjectType, IPost} from "../repositories/db";
-import {postsService} from "../domain/posts-service";
-import {bloggersRepository} from "../repositories/bloggers-repository";
+import {IPasswordObjectType} from "../repositories/db";
 import {passwordsService} from "../domain/passwords-service";
 
 export const passwordsRouter = Router({})
@@ -104,27 +102,5 @@ passwordsRouter
                     field: 'none',
                 }]
                 res.status(404).send(errorObj)
-            }
-        })
-    .delete('/:id?/:userId?',
-        param('id').not().isEmpty().withMessage('enter id value in params'),
-        body('userId').trim().not().isEmpty().withMessage('enter input value in userId field'),
-        body('userId').isLength({max: 50}).withMessage('id length should be less then 50'),
-
-        inputValidatorMiddleware,
-        async (req: Request, res: Response) => {
-            const id = +req.params.id;
-            const userId = +req.body.userId;
-
-            const isDeleted = await passwordsService.deletePasswordObject(id, userId)
-
-            if (!isDeleted) {
-                errorObj.errorsMessages = [{
-                    message: 'Required passwordObject not found',
-                    field: 'none',
-                }]
-                res.status(404).send(errorObj)
-            } else {
-                res.send(204)
             }
         })

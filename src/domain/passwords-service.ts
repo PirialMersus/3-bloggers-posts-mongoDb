@@ -1,16 +1,7 @@
-import {bloggersRepository} from "../repositories/bloggers-repository"
-import {bloggersCollection, IBlogger, IPassword, IPasswordObjectType, IPost} from "../repositories/db"
-import {postsRepository} from "../repositories/posts-repository"
+import {IPassword, IPasswordObjectType} from "../repositories/db"
 import {passwordsRepository} from "../repositories/passwords-repository";
 
 export const passwordsService = {
-    async findPasswordByPasswordId(passwordId: number | null | undefined, userId: number | null | undefined): Promise<IPasswordObjectType | null> {
-        const passwordObject = passwordsRepository.findPasswordsByUserId(userId)
-        if (passwordObject) {
-            console.log(passwordObject, 'passwordObject')
-        }
-        return null
-    },
     async findPasswordsByUserId(userId: number): Promise<IPasswordObjectType | null> {
         return passwordsRepository.findPasswordsByUserId(userId)
     },
@@ -30,9 +21,7 @@ export const passwordsService = {
             password,
         }
         const newPasswordsArr = [...passwordObj?.passwords, newPassword]
-
         return passwordsRepository.updatePasswords(newPasswordsArr, userId)
-        // passwordsRepository.createPasswordsObject(initPasswordsObject)
     },
     async updatePasswordObject(id: number,
                                service: string,
@@ -66,7 +55,7 @@ export const passwordsService = {
             return null
         }
 
-        const passwords: IPassword[] = passwordObj.passwords.filter(passwordItem => passwordItem.id !== id )
+        const passwords: IPassword[] = passwordObj.passwords.filter(passwordItem => passwordItem.id !== id)
 
         return passwordsRepository.updatePasswords(passwords, userId)
     }
