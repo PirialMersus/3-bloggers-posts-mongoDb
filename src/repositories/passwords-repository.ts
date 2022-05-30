@@ -27,7 +27,7 @@ export const passwordsRepository = {
         await passwordsCollection.insertOne(newPasswordObject)
         return newPasswordObject
     },
-    async createPassword(newPasswords: IPassword[], userId: number): Promise<boolean> {
+    async updatePasswords(newPasswords: IPassword[], userId: number): Promise<boolean> {
 
         const result = await passwordsCollection.updateOne({userId}, {
             $set: {
