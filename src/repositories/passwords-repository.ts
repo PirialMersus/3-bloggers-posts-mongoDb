@@ -7,6 +7,7 @@ import {
     IPost
 } from "./db";
 import {bloggersRepository} from "./bloggers-repository";
+import {log} from "util";
 
 export const passwordsRepository = {
     async findPasswordByPasswordId(passwordId: string | null | undefined): Promise<IPasswordObjectType | null> {
@@ -14,13 +15,10 @@ export const passwordsRepository = {
         return passwordsCollection.findOne({passwordId})
     },
     async findPasswordsByUserId(userId: number | null | undefined): Promise<IPasswordObjectType | null> {
-        console.log('userId', userId)
+
         if (userId) {
-            let passwordObject = passwordsCollection.findOne({userId})
-            console.log('passwordObject', passwordObject)
-            if (passwordObject) {
-                return passwordObject
-            }
+            const passwordObject = await passwordsCollection.findOne({userId: userId})
+            return passwordObject
         }
         return null
     },
@@ -36,9 +34,7 @@ export const passwordsRepository = {
                 passwords: newPasswords
             }
         })
-        console.log('userId', userId)
-        console.log('newPasswords', newPasswords)
-        console.log('result.matchedCount', result.matchedCount)
+
         return result.matchedCount === 1
     },
     // async updatePasswordObject(userId: number, passwords: IPassword[]): Promise<boolean> {
@@ -57,7 +53,7 @@ export const passwordsRepository = {
     //     return result.matchedCount === 1
     // },
 
-    async deletePost(id: number): Promise<boolean> {
+    async deletePassword(id: number): Promise<boolean> {
         const result = await postsCollection.deleteOne({id})
         return result.deletedCount === 1
     }

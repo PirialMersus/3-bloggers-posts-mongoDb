@@ -40,7 +40,6 @@ export const passwordsService = {
                                password: string,
                                userId: number): Promise<IPasswordObjectType | null> {
         const passwordObj: IPasswordObjectType | null = await passwordsRepository.findPasswordsByUserId(userId)
-        console.log('passwordObj', passwordObj)
         if (!passwordObj?.passwords) {
             return null
         }
@@ -57,10 +56,18 @@ export const passwordsService = {
             }
         })
         const newPasswordObject: IPasswordObjectType = {userId: userId, passwords: passwords}
-        return passwordsRepository.createPasswordsObject(newPasswordObject)
+        const isPasswordUpdated: Promise<boolean> = passwordsRepository.createPassword(passwords, userId)
+        return isPasswordUpdated ? newPasswordObject : null
     },
 
-    async deletePasswordObject(id: number): Promise<boolean> {
-        return postsRepository.deletePost(id)
+    async deletePasswordObject(id: number, userId: number): Promise<boolean | null> {
+        const passwordObj: IPasswordObjectType | null = await passwordsRepository.findPasswordsByUserId(userId)
+        if (!passwordObj?.passwords) {
+            return null
+        }
+
+        const passwords: IPassword[] = passwordObj.passwords.filter(passwordItem => passwordItem.id !== id )
+
+        return passwordsRepository.createPassword(passwords, userId)
     }
 }

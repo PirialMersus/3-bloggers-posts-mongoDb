@@ -21,7 +21,7 @@ passwordsRouter
                 res.send(404)
             }
         })
-    .post('/',
+    .post('/create',
         body('service').trim().not().isEmpty().withMessage('enter input value in service field'),
         body('name').trim().not().isEmpty().withMessage('enter input value in name field'),
         body('password').trim().not().isEmpty().withMessage('enter input value in password field'),
@@ -50,6 +50,29 @@ passwordsRouter
                 res.status(404).send(errorObj)
             }
         })
+    .post('/delete',
+        body('passwordId').trim().not().isEmpty().withMessage('enter id value in params'),
+        body('passwordId').isLength({max: 50}).withMessage('id length should be less then 50'),
+        body('userId').trim().not().isEmpty().withMessage('enter input value in userId field'),
+        body('userId').isLength({max: 50}).withMessage('id length should be less then 50'),
+
+        inputValidatorMiddleware,
+        async (req: Request, res: Response) => {
+            const passwordId = +req.body.passwordId;
+            const userId = +req.body.userId;
+
+            const isDeleted = await passwordsService.deletePasswordObject(passwordId, userId)
+
+            if (!isDeleted) {
+                errorObj.errorsMessages = [{
+                    message: 'Required passwordObject not found',
+                    field: 'none',
+                }]
+                res.status(404).send(errorObj)
+            } else {
+                res.send(204)
+            }
+        })
     .put('/',
 
         body('id').trim().not().isEmpty().withMessage('enter input value in id field'),
@@ -66,11 +89,11 @@ passwordsRouter
 
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
-            const id = req.body.id;
+            const id = +req.body.id;
             const service = req.body.service;
             const name = req.body.name;
             const password = req.body.password;
-            const userId = req.body.userId;
+            const userId = +req.body.userId;
 
             const newPasswordObject: IPasswordObjectType | null = await passwordsService.updatePasswordObject(id, service, name, password, userId)
             if (newPasswordObject) {
@@ -83,14 +106,17 @@ passwordsRouter
                 res.status(404).send(errorObj)
             }
         })
-    .delete('/:id?',
+    .delete('/:id?/:userId?',
         param('id').not().isEmpty().withMessage('enter id value in params'),
+        body('userId').trim().not().isEmpty().withMessage('enter input value in userId field'),
+        body('userId').isLength({max: 50}).withMessage('id length should be less then 50'),
+
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
             const id = +req.params.id;
+            const userId = +req.body.userId;
 
-            const isDeleted = await postsService.deletePost(id)
-
+            const isDeleted = await passwordsService.deletePasswordObject(id, userId)
 
             if (!isDeleted) {
                 errorObj.errorsMessages = [{
