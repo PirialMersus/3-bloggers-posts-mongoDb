@@ -1,13 +1,24 @@
-import {IBlogger, IPost, postsCollection} from "./db";
+import {bloggersCollection, IBlogger, IPost, postsCollection} from "./db";
 import {bloggersRepository} from "./bloggers-repository";
 
 export const postsRepository = {
-    async findPosts(name: string | null | undefined): Promise<IPost[]> {
-        const findObject: any = {}
+    async findPosts(pageNumber: number, pageSize: number, skip: number): Promise<IPost[]> {
+        const count = await postsCollection.find({}).count()
+        const foundPosts: IPost[] = await postsCollection
+            .find({})
+            .skip(skip)
+            .limit(pageSize)
+            .toArray()
 
-        if (name) findObject.name = {$regex: name}
-
-        return postsCollection.find(findObject).toArray()
+        return new Promise((resolve) => {
+            resolve({
+                pagesCount: Math.ceil(count / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: count,
+                items: foundPosts
+            })
+        })
     },
     async findPostById(id: number): Promise<IPost | null> {
         let post = postsCollection.findOne({id})

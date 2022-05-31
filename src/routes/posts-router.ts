@@ -4,11 +4,15 @@ import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator
 import {IPost} from "../repositories/db";
 import {postsService} from "../domain/posts-service";
 import {bloggersService} from "../domain/bloggers-service";
-
+export interface IQuery {
+    PageNumber: string
+    PageSize: string
+}
 export const postsRouter = Router({})
-//TODO ask help
-postsRouter.get('/', async (req: Request<{},{},{},{name: string}>, res: Response) => {
-    const post: IPost[] = await postsService.findPosts(req.query.name)
+postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => {
+    const pageNumber = req.query.PageNumber ? +req.query.PageNumber : 1
+    const pageSize = req.query.PageSize ? +req.query.PageSize : 10
+    const post: IPost[] = await postsService.findPosts(pageNumber, pageSize)
     res.send(post);
 })
     .get('/:postId?',
@@ -32,6 +36,13 @@ postsRouter.get('/', async (req: Request<{},{},{},{name: string}>, res: Response
         body('content').isLength({max: 1000}).withMessage('content length should be less then 1000'),
         body('shortDescription').isLength({max: 100}).withMessage('shortDescription length should be less then 100'),
         body('bloggerId').isLength({max: 1000}).withMessage('bloggerId length should be less then 1000'),
+        body('bloggerId').custom(async (value, {req}) => {
+            const isBloggerPresent = await bloggersService.findBloggerById(+value)
+            if (!isBloggerPresent) {
+                throw new Error('incorrect blogger id');
+            }
+            return true;
+        }),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
 

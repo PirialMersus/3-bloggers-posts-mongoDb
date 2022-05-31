@@ -3,8 +3,10 @@ import {IPost} from "../repositories/db"
 import {postsRepository} from "../repositories/posts-repository"
 
 export const postsService = {
-    async findPosts(name: string | null | undefined): Promise<IPost[]> {
-        return postsRepository.findPosts(name)
+    async findPosts(pageNumber: number, pageSize: number): Promise<IPost[]> {
+
+        const skip = (pageNumber - 1) * pageSize
+        return postsRepository.findPosts(pageNumber, pageSize, skip)
     },
     async findPostById(id: number): Promise<IPost | null> {
         return postsRepository.findPostById(id)

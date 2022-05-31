@@ -10,11 +10,9 @@ export interface IFindObj {
 }
 
 export const bloggersService = {
-    findBloggers(queryObj: core.Query): Promise<IReturnedFindBloggersObj> {
+    findBloggers(name: string, pageNumber: number, pageSize: number): Promise<IReturnedFindBloggersObj> {
 
-        const name = queryObj.SearchNameTerm ? queryObj.SearchNameTerm.toString() : ''
-        const pageNumber = queryObj.PageNumber ? +queryObj.PageNumber : 1
-        const pageSize = queryObj.PageSize ? +queryObj.PageSize : 10
+
         const skip = (pageNumber - 1) * pageSize
         const findConditionsObj: IFindObj = {
             name,

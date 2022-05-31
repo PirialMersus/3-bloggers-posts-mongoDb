@@ -1,6 +1,7 @@
 import {bloggersCollection, IBlogger} from "./db";
 import {IFindObj} from "../domain/bloggers-service";
 import {FindCursor} from "mongodb";
+import {log} from "util";
 
 export interface IReturnedFindBloggersObj {
     pagesCount: number,
@@ -11,17 +12,20 @@ export interface IReturnedFindBloggersObj {
 }
 
 export const bloggersRepository = {
-    async findBloggers(findConditionsObj: IFindObj): Promise<IReturnedFindBloggersObj> {
+    async findBloggers({name, pageNumber, pageSize, skip}: IFindObj): Promise<IReturnedFindBloggersObj> {
         const findObject: any = {}
-            //TODO custom validation
-        if (findConditionsObj.name) findObject.name = {$regex: findConditionsObj.name}
+        if (name) findObject.name = {$regex: name}
         const count = await bloggersCollection.find(findObject).count()
-        const foundBloggers: IBlogger[] = await bloggersCollection.find(findObject).skip(findConditionsObj.skip).limit(findConditionsObj.pageSize).toArray()
+        const foundBloggers: IBlogger[] = await bloggersCollection
+            .find(findObject)
+            .skip(skip)
+            .limit(pageSize)
+            .toArray()
         return new Promise((resolve) => {
             resolve({
-                pagesCount: Math.ceil(count / findConditionsObj.pageSize),
-                page: findConditionsObj.pageNumber,
-                pageSize: findConditionsObj.pageSize,
+                pagesCount: Math.ceil(count / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
                 totalCount: count,
                 items: foundBloggers
             })

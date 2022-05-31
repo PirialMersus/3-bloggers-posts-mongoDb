@@ -7,8 +7,17 @@ import {IReturnedFindBloggersObj} from "../repositories/bloggers-repository";
 
 export const bloggersRouter = Router({})
 
-bloggersRouter.get('/', async (req: Request, res: Response) => {
-    const response: IReturnedFindBloggersObj = await bloggersService.findBloggers(req.query) // req.query.name?.toString()
+export interface IRequest {
+    SearchNameTerm: string,
+    PageNumber: string,
+    PageSize: string
+}
+
+bloggersRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) => {
+    const name = req.query.SearchNameTerm ? req.query.SearchNameTerm : ''
+    const pageNumber = req.query.PageNumber ? +req.query.PageNumber : 1
+    const pageSize = req.query.PageSize ? +req.query.PageSize : 10
+    const response: IReturnedFindBloggersObj = await bloggersService.findBloggers(name, pageNumber, pageSize)
     console.log('response', response)
     res.send(response);
 })
