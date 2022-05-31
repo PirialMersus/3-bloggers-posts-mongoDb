@@ -1,4 +1,4 @@
-import {IBlogger, postsCollection, IPost} from "./db";
+import {IBlogger, IPost, postsCollection} from "./db";
 import {bloggersRepository} from "./bloggers-repository";
 
 export const postsRepository = {

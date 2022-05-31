@@ -43,6 +43,7 @@ export async function runDb() {
         await client.connect();
         // Establish and verify connection
         await client.db("bloggers").command({ping: 1});
+        await client.db("newDbTest").command({ping: 1});
         console.log("Connected successfully to mongo server");
 
     } catch {

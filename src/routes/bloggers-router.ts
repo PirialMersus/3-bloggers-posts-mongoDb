@@ -3,12 +3,14 @@ import {body, param} from "express-validator";
 import {bloggersService} from '../domain/bloggers-service';
 import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator-middleware";
 import {IBlogger} from "../repositories/db";
+import {IReturnedFindBloggersObj} from "../repositories/bloggers-repository";
 
 export const bloggersRouter = Router({})
 
 bloggersRouter.get('/', async (req: Request, res: Response) => {
-    const bloggers: IBlogger[] = await bloggersService.findBloggers(req.query.name?.toString())
-    res.send(bloggers);
+    const response: IReturnedFindBloggersObj = await bloggersService.findBloggers(req.query) // req.query.name?.toString()
+    console.log('response', response)
+    res.send(response);
 })
     .get('/:bloggerId?',
         param('bloggerId').not().isEmpty().withMessage('enter bloggerId value in params'),

@@ -6,9 +6,9 @@ import {postsService} from "../domain/posts-service";
 import {bloggersService} from "../domain/bloggers-service";
 
 export const postsRouter = Router({})
-
-postsRouter.get('/', async (req: Request, res: Response) => {
-    const post: IPost[] = await postsService.findPosts(req.query.name?.toString())
+//TODO ask help
+postsRouter.get('/', async (req: Request<{},{},{},{name: string}>, res: Response) => {
+    const post: IPost[] = await postsService.findPosts(req.query.name)
     res.send(post);
 })
     .get('/:postId?',

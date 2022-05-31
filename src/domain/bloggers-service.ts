@@ -1,10 +1,31 @@
-import {bloggersRepository} from "../repositories/bloggers-repository"
+import {bloggersRepository, IReturnedFindBloggersObj} from "../repositories/bloggers-repository"
 import {IBlogger} from "../repositories/db"
+import * as core from "express-serve-static-core";
+
+export interface IFindObj {
+    name: string,
+    pageNumber: number,
+    pageSize: number,
+    skip: number,
+}
 
 export const bloggersService = {
-    async findBloggers(name: string | null | undefined): Promise<IBlogger[]> {
-        return bloggersRepository.findBloggers(name)
+    findBloggers(queryObj: core.Query): Promise<IReturnedFindBloggersObj> {
+
+        const name = queryObj.SearchNameTerm ? queryObj.SearchNameTerm.toString() : ''
+        const pageNumber = queryObj.PageNumber ? +queryObj.PageNumber : 1
+        const pageSize = queryObj.PageSize ? +queryObj.PageSize : 10
+        const skip = (pageNumber - 1) * pageSize
+        const findConditionsObj: IFindObj = {
+            name,
+            pageNumber,
+            pageSize,
+            skip,
+        }
+
+        return bloggersRepository.findBloggers(findConditionsObj)
     },
+
     async findBloggerById(id: number): Promise<IBlogger | null> {
         return bloggersRepository.findBloggerById(id)
     },
