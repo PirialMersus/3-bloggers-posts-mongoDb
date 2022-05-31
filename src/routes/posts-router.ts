@@ -3,6 +3,7 @@ import {body, param} from "express-validator";
 import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator-middleware";
 import {IPost} from "../repositories/db";
 import {postsService} from "../domain/posts-service";
+import {bloggersService} from "../domain/bloggers-service";
 
 export const postsRouter = Router({})
 
@@ -11,7 +12,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
     res.send(post);
 })
     .get('/:postId?',
-        param('postId').not().isEmpty().withMessage('enter postId value in params'),
+        param('postId').trim().not().isEmpty().withMessage('enter postId value in params'),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
             let post: IPost | null = await postsService.findPostById(+req.params.postId)
@@ -23,10 +24,12 @@ postsRouter.get('/', async (req: Request, res: Response) => {
             }
         })
     .post('/',
-        body('title').not().isEmpty().withMessage('enter input value in title field'),
-        body('content').not().isEmpty().withMessage('enter input value in content field'),
-        body('bloggerId').not().isEmpty().withMessage('enter input value in bloggerId field'),
+        body('title').trim().not().isEmpty().withMessage('enter input value in title field'),
+        body('shortDescription').trim().not().isEmpty().withMessage('enter input value in shortDescription field'),
+        body('content').trim().not().isEmpty().withMessage('enter input value in content field'),
+        body('bloggerId').trim().not().isEmpty().withMessage('enter input value in bloggerId field'),
         body('title').isLength({max: 30}).withMessage('title length should be less then 30'),
+        body('content').isLength({max: 1000}).withMessage('content length should be less then 1000'),
         body('shortDescription').isLength({max: 100}).withMessage('shortDescription length should be less then 100'),
         body('bloggerId').isLength({max: 1000}).withMessage('bloggerId length should be less then 1000'),
         inputValidatorMiddleware,
@@ -41,14 +44,22 @@ postsRouter.get('/', async (req: Request, res: Response) => {
 
         })
     .put('/:id?',
-        body('bloggerId').not().isEmpty().withMessage('enter input value in bloggerId field'),
-        body('title').not().isEmpty().withMessage('enter input value in title field'),
-        body('shortDescription').not().isEmpty().withMessage('enter input value in shortDescription field'),
-        body('content').not().isEmpty().withMessage('enter input value in content field'),
+        body('bloggerId').custom(async (value, {req}) => {
+            const isBloggerPresent = await bloggersService.findBloggerById(+value)
+            if (!isBloggerPresent) {
+                throw new Error('incorrect blogger id');
+            }
+            return true;
+        }),
+        body('bloggerId').trim().not().isEmpty().withMessage('enter input value in bloggerId field'),
+        body('title').trim().not().isEmpty().withMessage('enter input value in title field'),
+        body('shortDescription').trim().not().isEmpty().withMessage('enter input value in shortDescription field'),
+        body('content').trim().not().isEmpty().withMessage('enter input value in content field'),
         body('title').isLength({max: 30}).withMessage('title length should be less then 30'),
+        body('content').isLength({max: 1000}).withMessage('content length should be less then 1000'),
         body('shortDescription').isLength({max: 100}).withMessage('shortDescription length should be less then 100'),
         body('bloggerId').isLength({max: 1000}).withMessage('bloggerId length should be less then 1000'),
-        param('id').not().isEmpty().withMessage('enter id value in params'),
+        param('id').trim().not().isEmpty().withMessage('enter id value in params'),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
             const title = req.body.title;
@@ -71,7 +82,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
             }
         })
     .delete('/:id?',
-        param('id').not().isEmpty().withMessage('enter id value in params'),
+        param('id').trim().not().isEmpty().withMessage('enter id value in params'),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
             const id = +req.params.id;
