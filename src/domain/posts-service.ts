@@ -1,9 +1,9 @@
 import {bloggersRepository} from "../repositories/bloggers-repository"
 import {IPost} from "../repositories/db"
-import {postsRepository} from "../repositories/posts-repository"
+import {IReturnedFindPostsObj, postsRepository} from "../repositories/posts-repository"
 
 export const postsService = {
-    async findPosts(pageNumber: number, pageSize: number): Promise<IPost[]> {
+    async findPosts(pageNumber: number, pageSize: number): Promise<IReturnedFindPostsObj> {
 
         const skip = (pageNumber - 1) * pageSize
         return postsRepository.findPosts(pageNumber, pageSize, skip)

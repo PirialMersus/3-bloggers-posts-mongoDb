@@ -1,8 +1,15 @@
 import {bloggersCollection, IBlogger, IPost, postsCollection} from "./db";
 import {bloggersRepository} from "./bloggers-repository";
+export interface IReturnedFindPostsObj {
+    pagesCount: number,
+    page: number,
+    pageSize: number,
+    totalCount: number,
+    items: IPost[]
+}
 
 export const postsRepository = {
-    async findPosts(pageNumber: number, pageSize: number, skip: number): Promise<IPost[]> {
+    async findPosts(pageNumber: number, pageSize: number, skip: number): Promise<IReturnedFindPostsObj> {
         const count = await postsCollection.find({}).count()
         const foundPosts: IPost[] = await postsCollection
             .find({})

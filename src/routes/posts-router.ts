@@ -4,6 +4,7 @@ import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator
 import {IPost} from "../repositories/db";
 import {postsService} from "../domain/posts-service";
 import {bloggersService} from "../domain/bloggers-service";
+import {IReturnedFindPostsObj} from "../repositories/posts-repository";
 export interface IQuery {
     PageNumber: string
     PageSize: string
@@ -12,8 +13,8 @@ export const postsRouter = Router({})
 postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => {
     const pageNumber = req.query.PageNumber ? +req.query.PageNumber : 1
     const pageSize = req.query.PageSize ? +req.query.PageSize : 10
-    const post: IPost[] = await postsService.findPosts(pageNumber, pageSize)
-    res.send(post);
+    const posts: IReturnedFindPostsObj = await postsService.findPosts(pageNumber, pageSize)
+    res.send(posts);
 })
     .get('/:postId?',
         param('postId').trim().not().isEmpty().withMessage('enter postId value in params'),
