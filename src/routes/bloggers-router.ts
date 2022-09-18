@@ -25,6 +25,22 @@ bloggersRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response
         param('bloggerId').not().isEmpty().withMessage('enter bloggerId value in params'),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
+        // lines added
+            const pageNumber = req.query.PageNumber ? +req.query.PageNumber : 1
+            const pageSize = req.query.PageSize ? +req.query.PageSize : 10
+            let blogger: IBlogger | null = await bloggersService.findBloggerById(+req.params.bloggerId)
+
+            if (blogger) {
+                res.send(blogger)
+            } else {
+                res.send(404)
+            }
+        })
+    .get('/:bloggerId/posts',
+        param('bloggerId').not().isEmpty().withMessage('enter bloggerId value in params'),
+        inputValidatorMiddleware,
+        async (req: Request, res: Response) => {
+        // lines added
             let blogger: IBlogger | null = await bloggersService.findBloggerById(+req.params.bloggerId)
 
             if (blogger) {
