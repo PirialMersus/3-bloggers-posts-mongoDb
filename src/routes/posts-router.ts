@@ -3,8 +3,9 @@ import {body, param} from "express-validator";
 import {errorObj, inputValidatorMiddleware} from "../middlewares/input-validator-middleware";
 import {IPost} from "../repositories/db";
 import {postsService} from "../domain/posts-service";
-import {bloggersService} from "../domain/bloggers-service";
+import {blogsService} from "../domain/blogs-service";
 import {IReturnedFindPostsObj} from "../repositories/posts-repository";
+import {authMiddleware} from "../middlewares/auth-middleware";
 export interface IQuery {
     PageNumber: string
     PageSize: string
@@ -20,7 +21,7 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
         param('postId').trim().not().isEmpty().withMessage('enter postId value in params'),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
-            let post: IPost | null = await postsService.findPostById(+req.params.postId)
+            let post: IPost | null = await postsService.findPostById(req.params.postId)
 
             if (post) {
                 res.send(post)
@@ -29,6 +30,7 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
             }
         })
     .post('/',
+        authMiddleware,
         body('title').trim().not().isEmpty().withMessage('enter input value in title field'),
         body('shortDescription').trim().not().isEmpty().withMessage('enter input value in shortDescription field'),
         body('content').trim().not().isEmpty().withMessage('enter input value in content field'),
@@ -38,7 +40,7 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
         body('shortDescription').isLength({max: 100}).withMessage('shortDescription length should be less then 100'),
         body('bloggerId').isLength({max: 1000}).withMessage('bloggerId length should be less then 1000'),
         body('bloggerId').custom(async (value, {req}) => {
-            const isBloggerPresent = await bloggersService.findBloggerById(+value)
+            const isBloggerPresent = await blogsService.findBlogById(value)
             if (!isBloggerPresent) {
                 throw new Error('incorrect blogger id');
             }
@@ -50,14 +52,15 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
             const newPost = await postsService.createPost(req.body.title,
                 req.body.shortDescription,
                 req.body.content,
-                +req.body.bloggerId)
+                req.body.bloggerId)
 
             res.status(201).send(newPost)
 
         })
     .put('/:id?',
+        authMiddleware,
         body('bloggerId').custom(async (value, {req}) => {
-            const isBloggerPresent = await bloggersService.findBloggerById(+value)
+            const isBloggerPresent = await blogsService.findBlogById(value)
             if (!isBloggerPresent) {
                 throw new Error('incorrect blogger id');
             }
@@ -77,13 +80,13 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
             const title = req.body.title;
             const shortDescription = req.body.shortDescription;
             const content = req.body.content;
-            const bloggerId = +req.body.bloggerId;
+            const blogId = req.body.bloggerId;
 
-            const id = +req.params.id;
+            const id = req.params.id;
 
-            const isUpdated: boolean = await postsService.updatePost(id, title, shortDescription, content, bloggerId)
+            const isUpdated: boolean = await postsService.updatePost(id, title, shortDescription, content, blogId)
             if (isUpdated) {
-                const product = await postsService.findPostById(+req.params.id)
+                const product = await postsService.findPostById(req.params.id)
                 res.status(201).send(product)
             } else {
                 errorObj.errorsMessages = [{
@@ -94,10 +97,11 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
             }
         })
     .delete('/:id?',
+        authMiddleware,
         param('id').trim().not().isEmpty().withMessage('enter id value in params'),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
-            const id = +req.params.id;
+            const id = req.params.id;
 
             const isDeleted = await postsService.deletePost(id)
 

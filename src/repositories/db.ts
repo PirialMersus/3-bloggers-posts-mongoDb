@@ -1,13 +1,14 @@
 import {MongoClient} from 'mongodb'
 
-export interface IBlogger {
+export interface IBlog {
     name: string,
     youtubeUrl: string,
-    id: number
+    id: string,
+    createdAt: string
 }
 export interface IPost {
-    id: number,
-    bloggerId: number,
+    id: string,
+    bloggerId: string,
     title: string,
     shortDescription: string,
     content: string,
@@ -32,7 +33,7 @@ export interface IPasswordObjectType {
 const uri = "mongodb+srv://mersus:genafe@bloggers.ypwqb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 export const client = new MongoClient(uri);
-export const bloggersCollection = client.db().collection<IBlogger>('bloggers')
+export const blogsCollection = client.db().collection<IBlog>('bloggers')
 export const postsCollection = client.db().collection<IPost>('posts')
 export const usersCollection = client.db().collection<IUser>('users')
 export const passwordsCollection = client.db().collection<IPasswordObjectType>('passwords')

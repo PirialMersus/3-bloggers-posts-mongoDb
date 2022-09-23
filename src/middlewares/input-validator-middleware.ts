@@ -8,7 +8,6 @@ interface IErrorMessage {
             field: string
         }
     ],
-    resultCode: number
 }
 
 export const errorObj: IErrorMessage = {
@@ -16,7 +15,6 @@ export const errorObj: IErrorMessage = {
         message: '',
         field: ''
     }],
-    resultCode: 0
 }
 
 export const inputValidatorMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +23,6 @@ export const inputValidatorMiddleware = (req: Request, res: Response, next: Next
         next()
     } else {
         res.status(400).json({
-            resultCode: 1,
             errorsMessages: errors.array().map(e => {
                 return {
                     message: e.msg,

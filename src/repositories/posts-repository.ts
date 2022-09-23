@@ -1,5 +1,5 @@
-import {bloggersCollection, IBlogger, IPost, postsCollection} from "./db";
-import {bloggersRepository} from "./bloggers-repository";
+import {IBlog, IPost, postsCollection} from "./db";
+import {blogsRepository} from "./blogs-repository";
 export interface IReturnedFindPostsObj {
     pagesCount: number,
     page: number,
@@ -27,7 +27,7 @@ export const postsRepository = {
             })
         })
     },
-    async findPostById(id: number): Promise<IPost | null> {
+    async findPostById(id: string): Promise<IPost | null> {
         let post = postsCollection.findOne({id})
         if (post) {
             return post
@@ -41,19 +41,19 @@ export const postsRepository = {
         await postsCollection.insertOne(newPost)
         return newPost
     },
-    async updatePost(id: number,
+    async updatePost(id: string,
                      title: string,
                      shortDescription: string,
                      content: string,
-                     bloggerId: number): Promise<boolean> {
-        const blogger: IBlogger | null = await bloggersRepository.findBloggerById(bloggerId)
+                     blogId: string): Promise<boolean> {
+        const blogger: IBlog | null = await blogsRepository.findBloggerById(blogId)
         let result = await postsCollection.updateOne({id}, {
             $set: {
                 title,
                 shortDescription,
                 content,
-                bloggerId,
-                bloggerName: blogger?.name
+                blogId,
+                blogName: blogger?.name
                     ? blogger?.name
                     : 'unknown'
             }
@@ -61,7 +61,7 @@ export const postsRepository = {
         return result.matchedCount === 1
     },
 
-    async deletePost(id: number): Promise<boolean> {
+    async deletePost(id: string): Promise<boolean> {
         const result = await postsCollection.deleteOne({id})
         return result.deletedCount === 1
     }
