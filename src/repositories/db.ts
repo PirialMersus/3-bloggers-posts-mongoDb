@@ -8,11 +8,12 @@ export interface IBlog {
 }
 export interface IPost {
     id: string,
-    bloggerId: string,
+    blogId: string,
     title: string,
     shortDescription: string,
     content: string,
-    bloggerName: string
+    blogName: string,
+    createdAt: string
 }
 export interface IUser {
     id: number,

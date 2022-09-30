@@ -1,21 +1,33 @@
 import {blogsCollection, IBlog} from "./db";
 import {IFindObj} from "../domain/blogs-service";
+import {Filter} from "mongodb";
 
-export interface IReturnedFindBloggersObj {
+export interface IReturnedFindObj<T> {
     pagesCount: number,
     page: number,
     pageSize: number,
     totalCount: number,
-    items: IBlog[]
+    items: T[]
 }
 
+// export interface IReturnedFindPostsObj {
+//     pagesCount: number,
+//     page: number,
+//     pageSize: number,
+//     totalCount: number,
+//     items: IPost[]
+// }
+
 export const blogsRepository = {
-    async findBlogs({name, pageNumber, pageSize, skip}: IFindObj): Promise<IReturnedFindBloggersObj> {
-        const findObject: any = {}
+    async findBlogs({name, pageNumber, pageSize, skip}: IFindObj,
+                    sortBy: keyof IBlog,
+                    sortDirection: string): Promise<IReturnedFindObj<IBlog>> {
+        const findObject: Filter<IBlog> = {}
         if (name) findObject.name = {$regex: name}
-        const count = await blogsCollection.find(findObject).count()
+        const count = await blogsCollection.countDocuments(findObject)
         const foundBloggers: IBlog[] = await blogsCollection
-            .find(findObject)
+            .find(findObject, {projection: {_id: false}})
+            .sort({[sortBy]: sortDirection === 'desc' ? -1 : 1})
             .skip(skip)
             .limit(pageSize)
             .toArray()
@@ -30,8 +42,8 @@ export const blogsRepository = {
         })
     },
 
-    async findBloggerById(id: string): Promise<IBlog | null> {
-        const blog = blogsCollection.findOne({id})
+    async findBlogById(id: string): Promise<IBlog | null> {
+        const blog = blogsCollection.findOne({id}, {projection: {_id: 0}})
         if (blog) {
             return blog
         } else {
@@ -54,5 +66,9 @@ export const blogsRepository = {
     async deleteBlog(id: string): Promise<boolean> {
         const result = await blogsCollection.deleteOne({id})
         return result.deletedCount === 1
+    },
+
+    async getTotalCount(filter: Filter<IBlog>): Promise<number> {
+        return blogsCollection.countDocuments(filter)
     }
 }

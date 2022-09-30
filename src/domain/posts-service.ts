@@ -1,25 +1,61 @@
-import {blogsRepository} from "../repositories/blogs-repository"
+import {blogsRepository, IReturnedFindObj} from "../repositories/blogs-repository"
 import {IPost} from "../repositories/db"
-import {IReturnedFindPostsObj, postsRepository} from "../repositories/posts-repository"
+import {postsRepository} from "../repositories/posts-repository"
+
+export type FindConditionsPostsObjType = {
+    pageNumber: number
+    pageSize: number
+    skip: number
+}
+export type FindConditionsBlogsObjType = {
+    blogId: string
+    pageNumber: number
+    pageSize: number
+    skip: number
+}
 
 export const postsService = {
-    async findPosts(pageNumber: number, pageSize: number): Promise<IReturnedFindPostsObj> {
-
+    findPosts(pageNumber: number,
+              pageSize: number,
+              sortBy: keyof IPost,
+              sortDirection: string
+    ): Promise<IReturnedFindObj<IPost>> {
         const skip = (pageNumber - 1) * pageSize
-        return postsRepository.findPosts(pageNumber, pageSize, skip)
+        const findConditionsObj: FindConditionsPostsObjType = {
+            pageNumber,
+            pageSize,
+            skip,
+        }
+        return postsRepository.findPosts(findConditionsObj, sortBy, sortDirection)
     },
     async findPostById(id: string): Promise<IPost | null> {
         return postsRepository.findPostById(id)
     },
-    async createPost(title: string, shortDescription: string, content: string, bloggerId: string): Promise<IPost> {
-        const blogger = await blogsRepository.findBloggerById(bloggerId)
+    async findPostsByBlogId(blogId: string,
+                            pageNumber: number,
+                            pageSize: number,
+                            sortBy: keyof IPost,
+                            sortDirection: string): Promise<IReturnedFindObj<IPost>> {
+        const skip = (pageNumber - 1) * pageSize
+        const findConditionsObj: FindConditionsBlogsObjType = {
+            blogId,
+            pageNumber,
+            pageSize,
+            skip,
+        }
+        return postsRepository.findPostsByBlogId(findConditionsObj, sortBy, sortDirection)
+    },
+    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<IPost> {
+        const blog = await blogsRepository.findBlogById(blogId)
+        const date = new Date()
         const newPost: IPost = {
             title,
             shortDescription,
             content,
-            bloggerId,
-            bloggerName: blogger ? blogger.name : 'unknown',
-            id: (+(new Date())).toString(),
+            blogId,
+            blogName: blog ? blog.name : 'unknown',
+            id: (+date).toString(),
+            createdAt: date.toISOString()
         }
         return postsRepository.createPost(newPost)
     },
@@ -27,8 +63,8 @@ export const postsService = {
                      title: string,
                      shortDescription: string,
                      content: string,
-                     bloggerId: string): Promise<boolean> {
-        return postsRepository.updatePost(id, title, shortDescription, content, bloggerId)
+                     blogId: string): Promise<boolean> {
+        return postsRepository.updatePost(id, title, shortDescription, content, blogId)
     },
 
     async deletePost(id: string): Promise<boolean> {

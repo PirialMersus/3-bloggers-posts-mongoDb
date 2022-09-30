@@ -1,4 +1,4 @@
-import {blogsRepository, IReturnedFindBloggersObj} from "../repositories/blogs-repository"
+import {blogsRepository, IReturnedFindObj} from "../repositories/blogs-repository"
 import {IBlog} from "../repositories/db"
 
 export interface IFindObj {
@@ -9,9 +9,11 @@ export interface IFindObj {
 }
 
 export const blogsService = {
-    findBlogs(name: string, pageNumber: number, pageSize: number): Promise<IReturnedFindBloggersObj> {
-
-
+    findBlogs(name: string,
+              pageNumber: number,
+              pageSize: number,
+              sortBy: keyof IBlog,
+              sortDirection: string): Promise<IReturnedFindObj<IBlog>> {
         const skip = (pageNumber - 1) * pageSize
         const findConditionsObj: IFindObj = {
             name,
@@ -20,18 +22,19 @@ export const blogsService = {
             skip,
         }
 
-        return blogsRepository.findBlogs(findConditionsObj)
+        return blogsRepository.findBlogs(findConditionsObj, sortBy, sortDirection)
     },
 
     async findBlogById(id: string): Promise<IBlog | null> {
-        return blogsRepository.findBloggerById(id)
+        return blogsRepository.findBlogById(id)
     },
     async createBlog(name: string, youtubeUrl: string): Promise<IBlog | null> {
+        const date = new Date()
         const newBlogger = {
             name,
             youtubeUrl,
-            id: (+(new Date())).toString(),
-            createdAt: (new Date()).toISOString()
+            id: (+date).toString(),
+            createdAt: date.toISOString()
         }
         return blogsRepository.createBlogger(newBlogger)
     },

@@ -1,18 +1,15 @@
 import {IBlog, IPost, postsCollection} from "./db";
-import {blogsRepository} from "./blogs-repository";
-export interface IReturnedFindPostsObj {
-    pagesCount: number,
-    page: number,
-    pageSize: number,
-    totalCount: number,
-    items: IPost[]
-}
+import {blogsRepository, IReturnedFindObj} from "./blogs-repository";
+import {FindConditionsBlogsObjType, FindConditionsPostsObjType} from "../domain/posts-service";
 
 export const postsRepository = {
-    async findPosts(pageNumber: number, pageSize: number, skip: number): Promise<IReturnedFindPostsObj> {
+    async findPosts({pageNumber, pageSize, skip}: FindConditionsPostsObjType,
+                    sortBy: keyof IPost,
+                    sortDirection: string): Promise<IReturnedFindObj<IPost>> {
         const count = await postsCollection.find({}).count()
         const foundPosts: IPost[] = await postsCollection
-            .find({})
+            .find({}, {projection: {_id: false}})
+            .sort({[sortBy]: sortDirection === 'desc' ? -1 : 1})
             .skip(skip)
             .limit(pageSize)
             .toArray()
@@ -35,6 +32,26 @@ export const postsRepository = {
             return null
         }
     },
+    async findPostsByBlogId({blogId, pageNumber, pageSize, skip}: FindConditionsBlogsObjType,
+                            sortBy: keyof IPost,
+                            sortDirection: string): Promise<IReturnedFindObj<IPost>> {
+        const count = await postsCollection.find({blogId}).count()
+        const foundPosts: IPost[] = await postsCollection
+            .find({blogId}, {projection: {_id: false}})
+            .sort({[sortBy]: sortDirection === 'desc' ? -1 : 1})
+            .skip(skip)
+            .limit(pageSize)
+            .toArray()
+        return new Promise((resolve) => {
+            resolve({
+                pagesCount: Math.ceil(count / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: count,
+                items: foundPosts
+            })
+        })
+    },
     // have to have return value type
     async createPost(newPost: IPost): Promise<IPost> {
 
@@ -46,7 +63,7 @@ export const postsRepository = {
                      shortDescription: string,
                      content: string,
                      blogId: string): Promise<boolean> {
-        const blogger: IBlog | null = await blogsRepository.findBloggerById(blogId)
+        const blogger: IBlog | null = await blogsRepository.findBlogById(blogId)
         let result = await postsCollection.updateOne({id}, {
             $set: {
                 title,
