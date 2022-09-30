@@ -97,11 +97,10 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
         })
     .post('/:blogId/posts',
         authMiddleware,
-        param('blogId').not().isEmpty().withMessage('enter blogId value in params'),
+        param('blogId').trim().not().isEmpty().withMessage('enter blogId value in params'),
         body('title').trim().not().isEmpty().withMessage('enter input value in title field'),
         body('shortDescription').trim().not().isEmpty().withMessage('enter input value in shortDescription field'),
         body('content').trim().not().isEmpty().withMessage('enter input value in content field'),
-        body('blogId').trim().not().isEmpty().withMessage('enter input value in blogId field'),
         body('title').isLength({max: 30}).withMessage('title length should be less then 30'),
         body('content').isLength({max: 1000}).withMessage('content length should be less then 1000'),
         body('shortDescription').isLength({max: 100}).withMessage('shortDescription length should be less then 100'),
