@@ -133,7 +133,6 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
 
             const isDeleted = await postsService.deletePost(id)
 
-
             if (!isDeleted) {
                 errorObj.errorsMessages = [{
                     message: 'Required blogger not found',
