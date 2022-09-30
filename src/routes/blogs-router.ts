@@ -85,7 +85,6 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
             if (!regExp.test(req.body.youtubeUrl)) {
                 throw new Error('enter correct value');
             }
-
             return true;
         }),
         inputValidatorMiddleware,
