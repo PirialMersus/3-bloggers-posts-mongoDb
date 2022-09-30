@@ -84,7 +84,6 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
                 req.body.blogId)
 
             res.status(201).send(newPost)
-
         })
     .put('/:id?',
         authMiddleware,
