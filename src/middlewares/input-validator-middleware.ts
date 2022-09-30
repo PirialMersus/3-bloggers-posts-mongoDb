@@ -22,7 +22,7 @@ export const inputValidatorMiddleware = (req: Request, res: Response, next: Next
     if (errors.isEmpty()) {
         next()
     } else {
-        res.status(401).json({
+        res.status(400).json({
             errorsMessages: errors.array().map(e => {
                 return {
                     message: e.msg,
