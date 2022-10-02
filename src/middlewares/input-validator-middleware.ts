@@ -24,8 +24,10 @@ export const inputValidatorMiddleware = (req: Request, res: Response, next: Next
     } else {
         errors.array().map(e => {
             if (e.msg === 'incorrect blogId') {
-                res.status(404)
+                res.send(404)
                 return
+                console.log('incorrect blogId')
+
             }
         })
         res.status(400).json({

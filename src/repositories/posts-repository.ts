@@ -53,10 +53,10 @@ export const postsRepository = {
         })
     },
     // have to have return value type
-    async createPost(newPost: IPost): Promise<IPost> {
+    async createPost(newPost: IPost): Promise<IPost | null> {
 
         await postsCollection.insertOne(newPost)
-        return newPost
+        return postsCollection.findOne({id: newPost.id}, {projection: {_id: 0}})
     },
     async updatePost(id: string,
                      title: string,

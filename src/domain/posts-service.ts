@@ -45,7 +45,7 @@ export const postsService = {
         }
         return postsRepository.findPostsByBlogId(findConditionsObj, sortBy, sortDirection)
     },
-    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<IPost> {
+    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<IPost | null> {
         const blog = await blogsRepository.findBlogById(blogId)
         const date = new Date()
         const newPost: IPost = {
