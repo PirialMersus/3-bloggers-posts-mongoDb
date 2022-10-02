@@ -118,7 +118,7 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
             const newPost = await postsService.createPost(req.body.title,
                 req.body.shortDescription,
                 req.body.content,
-                req.body.blogId)
+                req.params.blogId)
 
             res.status(201).send(newPost)
         })
