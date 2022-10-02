@@ -23,7 +23,8 @@ export const blogsRepository = {
                     sortBy: keyof IBlog,
                     sortDirection: string): Promise<IReturnedFindObj<IBlog>> {
         const findObject: Filter<IBlog> = {}
-        if (name) findObject.name = {$regex: name}
+        if (name) findObject.name = {$regex: new RegExp(name, "i")}
+        console.log('name', name)
         const count = await blogsCollection.countDocuments(findObject)
         const foundBloggers: IBlog[] = await blogsCollection
             .find(findObject, {projection: {_id: false}})
