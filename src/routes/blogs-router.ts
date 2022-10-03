@@ -59,6 +59,13 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
     .get('/:blogId/posts',
 
         param('blogId').not().isEmpty().withMessage('enter blogId value in params'),
+        param('blogId').custom(async (value, {}) => {
+            const isBloggerPresent = await blogsService.findBlogById(value)
+            if (!isBloggerPresent) {
+                throw new Error('incorrect blogId');
+            }
+            return true;
+        }),
         inputValidatorMiddleware,
         async (req: Request<{ blogId: string }, {}, {}, IRequest>, res: Response) => {
             const pageNumber = req.query.pageNumber ? +req.query.pageNumber : 1
