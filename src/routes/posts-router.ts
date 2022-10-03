@@ -115,7 +115,7 @@ postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery>, res: Response) => 
             const isUpdated: boolean = await postsService.updatePost(id, title, shortDescription, content, blogId)
             if (isUpdated) {
                 const product = await postsService.findPostById(req.params.id)
-                res.status(201).send(product)
+                res.status(204).send(product)
             } else {
                 errorObj.errorsMessages = [{
                     message: 'Required post not found',

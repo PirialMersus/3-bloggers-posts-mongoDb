@@ -144,7 +144,7 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
             const isUpdated: boolean = await blogsService.updateBlogger(req.params.id, name, youtubeUrl)
             if (isUpdated) {
                 const blogger = await blogsService.findBlogById(req.params.id)
-                res.status(201).send(blogger)
+                res.status(204).send(blogger)
             } else {
                 errorObj.errorsMessages = [{
                     message: 'Required blogger not found',
