@@ -118,22 +118,29 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
         body('content').isLength({max: 1000}).withMessage('content length should be less then 1000'),
         body('shortDescription').isLength({max: 100}).withMessage('shortDescription length should be less then 100'),
         param('blogId').isLength({max: 1000}).withMessage('blogId length should be less then 1000'),
-        param('blogId').custom(async (value, {}) => {
-            const isBloggerPresent = await blogsService.findBlogById(value)
-            if (!isBloggerPresent) {
-                throw new Error('incorrect blogId');
-            }
-            return true;
-        }),
+        // param('blogId').custom(async (value, {}) => {
+        //     const isBloggerPresent = await blogsService.findBlogById(value)
+        //     if (!isBloggerPresent) {
+        //         throw new Error('incorrect blogId');
+        //     }
+        //     return true;
+        // }),
         inputValidatorMiddleware,
         async (req: Request, res: Response) => {
+            const blogId: string = req.params.blogId
 
-            const newPost = await postsService.createPost(req.body.title,
-                req.body.shortDescription,
-                req.body.content,
-                req.params.blogId)
 
-            res.status(201).send(newPost)
+            const isBloggerPresent = await blogsService.findBlogById(blogId)
+            if (isBloggerPresent) {
+                const newPost = await postsService.createPost(req.body.title,
+                    req.body.shortDescription,
+                    req.body.content,
+                    blogId)
+                res.status(201).send(newPost)
+            } else {
+                res.send(404);
+            }
+
         })
     .put('/:id?',
         authMiddleware,
