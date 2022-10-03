@@ -25,7 +25,7 @@ export const postsRepository = {
         })
     },
     async findPostById(id: string): Promise<IPost | null> {
-        let post = postsCollection.findOne({id})
+        let post = postsCollection.findOne({id}, {projection: {_id: 0}})
         if (post) {
             return post
         } else {
