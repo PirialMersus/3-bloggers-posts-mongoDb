@@ -59,13 +59,13 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
     .get('/:blogId/posts',
 
         param('blogId').not().isEmpty().withMessage('enter blogId value in params'),
-        param('blogId').custom(async (value, {}) => {
-            const isBloggerPresent = await blogsService.findBlogById(value)
-            if (!isBloggerPresent) {
-                throw new Error('incorrect blogId');
-            }
-            return true;
-        }),
+        // param('blogId').custom(async (value, {}) => {
+        //     const isBloggerPresent = await blogsService.findBlogById(value)
+        //     if (!isBloggerPresent) {
+        //         throw new Error('incorrect blogId');
+        //     }
+        //     return true;
+        // }),
         inputValidatorMiddleware,
         async (req: Request<{ blogId: string }, {}, {}, IRequest>, res: Response) => {
             const pageNumber = req.query.pageNumber ? +req.query.pageNumber : 1
@@ -73,13 +73,19 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
             const sortBy: string = req.query.sortBy ? req.query.sortBy : 'createdAt'
             const sortDirection = req.query.sortDirection ? req.query.sortDirection : 'desc'
             const blogId: string = req.params.blogId
-            const response: IReturnedFindObj<IPost> = await postsService.findPostsByBlogId(
-                blogId,
-                pageNumber,
-                pageSize,
-                serializedPostsSortBy(sortBy),
-                sortDirection)
-            res.send(response);
+            const isBloggerPresent = await blogsService.findBlogById(blogId)
+            if (isBloggerPresent) {
+                const response: IReturnedFindObj<IPost> = await postsService.findPostsByBlogId(
+                    blogId,
+                    pageNumber,
+                    pageSize,
+                    serializedPostsSortBy(sortBy),
+                    sortDirection)
+                res.send(response);
+            } else {
+                res.send(404);
+            }
+
         })
     .post('/',
         authMiddleware,
