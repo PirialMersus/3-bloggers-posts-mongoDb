@@ -132,8 +132,8 @@ blogsRouter.get('/', async (req: Request<{}, {}, {}, IRequest>, res: Response) =
     .put('/:id?',
         authMiddleware,
         param('id').trim().not().isEmpty().withMessage('enter id value in params'),
-        body('name').not().isEmpty().withMessage('enter input value in name field'),
-        body('youtubeUrl').not().isEmpty().withMessage('enter input value in youtubeUrl field'),
+        body('name').trim().not().isEmpty().withMessage('enter input value in name field'),
+        body('youtubeUrl').trim().not().isEmpty().withMessage('enter input value in youtubeUrl field'),
         body('youtubeUrl').isLength({max: 100}).withMessage('youtubeUrl length should be less then 100'),
         body('name').isLength({max: 15}).withMessage('name length should be less then 15'),
         body('youtubeUrl').custom((value, {req}) => {
